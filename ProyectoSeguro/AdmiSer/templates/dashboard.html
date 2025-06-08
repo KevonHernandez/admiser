@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+
+{% load static %}
+
+
+{% if messages %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  {% for message in messages %}
+  <p>{{ message }}</p>
+  {% endfor %}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="container py-4">
+  <h1 class="mb-4 text-center">Monitor de Servidores</h1>
+
+  <div class="mb-4 text-center">
+    <a href="{% url 'AdmiSer:registrarservidor' %}" class="btn btn-success btn-lg">
+      ➕ Registrar nuevo servidor
+    </a>
+  </div>
+
+  <div class="row" id="dashboard">
+    <!-- Aquí se cargan los servidores -->
+  </div>
+</div>
+
+{% endblock %}

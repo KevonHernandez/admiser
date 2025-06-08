@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Registro de Servidor</h2>
+
+    {% if messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="nombre_servidor" class="form-label">Nombre del Servidor</label>
+            <input type="text" class="form-control" id="nombre_servidor" name="nombre_servidor" required>
+        </div>
+        <div class="mb-3">
+            <label for="ip" class="form-label">Dirección IP</label>
+            <input type="text" class="form-control" id="ip" name="ip" placeholder="192.168.0.10" required>
+        </div>
+        <div class="mb-3">
+            <label for="sistema_operativo" class="form-label">Sistema Operativo</label>
+            <select class="form-select" name="sistema_operativo" id="sistema_operativo" required>
+                <option value="">Selecciona uno</option>
+                <option value="debian">Debian</option>
+                <option value="ubuntu">Ubuntu</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="servicios" class="form-label">Servicios Disponibles</label>
+            <select class="form-select" id="servicios" name="servicios" multiple required>
+                <option value="apache">Apache</option>
+                <option value="nginx">Nginx</option>
+                <option value="mysql">MySQL</option>
+                <option value="postgres">PostgreSQL</option>
+                <option value="ssh">SSH</option>
+                <option value="ftp">FTP</option>
+            </select>
+            <small class="text-muted">Usa Ctrl (o Cmd en Mac) para seleccionar múltiples</small>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Registrar Servidor</button>
+    </form>
+</div>
+{% endblock %}

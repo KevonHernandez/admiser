@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Registro</h2>
+    <!-- Bloque para mostrar mensajes -->
+    {% if messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+    </div>
+    {% endif %}
+
+<form method="POST" >
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="nombre_completo" class="form-label">Nombre Completo</label>
+            <input type="text" class="form-control" id="nombre_completo" name="nombre_completo" required>
+        </div>
+        <div class="mb-3">
+            <label for="nick" class="form-label">Nick</label>
+            <input type="text" class="form-control" id="nick" name="nick" required>
+        </div>
+        <div class="mb-3">
+            <label for="password1" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="password1" name="password1" required>
+        </div>
+        <div class="mb-3">
+            <label for="password2" class="form-label">Confirmación de Contraseña</label>
+            <input type="password" class="form-control" id="password2" name="password2" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+    </form>
+</div>
+{% endblock %}
