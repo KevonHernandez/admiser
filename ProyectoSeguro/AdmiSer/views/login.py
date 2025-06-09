@@ -1,14 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.core.mail import send_mail
-from django.utils import timezone
 from django.core.cache import cache
 import base64
-import random
 
 from ..views.session import establecer_pendiente_otp, limpiar_sesion_login
-from ..models import Usuario, OTPToken
-from ..forms import LoginForm, OTPForm
+from ..models import Usuario
+from ..forms import LoginForm
 from ..cripto.hasheo import password_valido
 
 MAX_INTENTOS = 5
@@ -20,13 +17,14 @@ def get_client_ip(request):
     return x_forwarded_for.split(',')[0] if x_forwarded_for else request.META.get('REMOTE_ADDR')
 
 
-def is_blocked(ip):
+def esta_bloqueada(ip):
     return cache.get(f'intentos_login_{ip}', 0) >= MAX_INTENTOS
 
 
 def registrar_intento(ip):
     intentos = cache.get(f'intentos_login_{ip}', 0) + 1
     cache.set(f'intentos_login_{ip}', intentos, timeout=TIEMPO_BLOQUEO)
+    print(f"Intentos de inicio de sesión para {ip}: {intentos}")
 
 
 def reset_intentos(ip):
@@ -36,9 +34,10 @@ def reset_intentos(ip):
 def login(request):
     ip = get_client_ip(request)
 
-    if is_blocked(ip):
+    if esta_bloqueada(ip):
         messages.error(
             request, 'Demasiados intentos fallidos. Intenta más tarde.')
+        
         return render(request, 'login.html', {'form': LoginForm()})
 
     form = LoginForm(request.POST or None)
@@ -46,7 +45,7 @@ def login(request):
     if request.method == 'GET':
         limpiar_sesion_login(request)
 
-    if is_blocked(ip):
+    if esta_bloqueada(ip):
         messages.error(
             request, 'Demasiados intentos fallidos. Intenta más tarde.')
         return render(request, 'login.html', {'form': LoginForm()})
@@ -66,12 +65,14 @@ def login(request):
                 return redirect('AdmiSer:verificar_otp')
             else:
                 registrar_intento(ip)
+                messages.error(request, 'Usuario o contraseña incorrectos.')
+
         except Usuario.DoesNotExist:
+            registrar_intento(ip)
             limpiar_sesion_login(request)
             messages.error(request, 'Usuario o contraseña incorrectos.')
-            registrar_intento(ip)
-
-        messages.error(request, 'Usuario o contraseña incorrectos.')
+    else:
+        registrar_intento(ip)
         limpiar_sesion_login(request)
 
     return render(request, 'login.html', {'form': form})

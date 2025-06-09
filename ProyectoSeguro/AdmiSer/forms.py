@@ -6,14 +6,19 @@ class LoginForm(forms.Form):
         label='Usuario',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingresa tu usuario'
+            'autofocus': 'autofocus',
+
+            'placeholder': ''
+
         })
     )
     password = forms.CharField(
         label='Contraseña',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingresa tu contraseña'
+            'autofocus': 'autofocus',
+
+            'placeholder': ''
         })
     )
     captcha = CaptchaField(label='Captcha')
@@ -24,6 +29,7 @@ class OTPForm(forms.Form):
         max_length=6,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingresa el código OTP'
+            'autofocus': 'autofocus',
+            'placeholder': 'Ingresa aqui el código OTP'
         })
     )
