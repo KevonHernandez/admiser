@@ -1,0 +1,25 @@
+# Entornos virtuales
+venv/
+.env
+
+# Archivos de entorno
+*.env
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+
+# Base de datos SQLite (si la usas en desarrollo)
+db.sqlite3
+
+# Configuración de SonarQube, cobertura, etc.
+coverage.xml
+*.log
+
+# Archivos y carpetas de Docker
+nginx/ssl/
+*.pid
+
+# Archivos temporales del sistema
+.DS_Store
+*.swp

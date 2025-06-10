@@ -12,7 +12,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+=======
+ALLOWED_HOSTS = ['*']
+>>>>>>> 7d863ff (Configuración de Docker, Nginx y certificados HTTPS)
 
 
 # Application definition
