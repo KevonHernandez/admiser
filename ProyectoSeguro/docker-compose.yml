@@ -12,6 +12,10 @@ services:
       - .env
     depends_on:
       - db
+    mem_limit: 512m
+    cpus: 0.5
+    dns:
+      - 8.8.8.8
 
   db:
     image: mysql:8
@@ -23,6 +27,8 @@ services:
       MYSQL_ROOT_PASSWORD: rootpass
     volumes:
       - mysql_data:/var/lib/mysql
+    mem_limit: 512m
+    cpus: 0.5
 
   nginx:
     image: nginx:latest
@@ -36,6 +42,10 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl
     depends_on:
       - web
+    mem_limit: 256m
+    cpus: 0.3
 
 volumes:
   mysql_data:
+  
+
