@@ -50,7 +50,7 @@ La plataforma permite a un administrador:
 
 - DFD Nivel 0, Nivel 1 y Nivel N
 - Tablas de elementos, amenazas y mitigaciones
-- Documento disponible en:  
+- Documento disponible en:  https://docs.google.com/spreadsheets/d/1bqkrJocpoKZAc-KG7rXUTdmRV-b47t5GvxDwki2I7-0/edit?usp=sharing
 ---
 
 ## 📦 Entregables
