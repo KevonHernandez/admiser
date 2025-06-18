@@ -1,33 +1,105 @@
 {% extends 'base.html' %}
 
-{% block title %}Iniciar Sesión{% endblock %}
+{% block title %}Monitor de Servidores{% endblock %}
 
 {% block content %}
+<div class="container py-5">
+  <h1 class="text-center mb-4">Monitor de Servidores</h1>
 
-{% load static %}
-
-
-{% if messages %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  {% for message in messages %}
-  <p>{{ message }}</p>
-  {% endfor %}
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endif %}
-
-<div class="container py-4">
-  <h1 class="mb-4 text-center">Monitor de Servidores</h1>
-
-  <div class="mb-4 text-center">
+  <div class="text-center mb-4">
     <a href="{% url 'AdmiSer:registrarservidor' %}" class="btn btn-success btn-lg">
       ➕ Registrar nuevo servidor
     </a>
   </div>
 
-  <div class="row" id="dashboard">
-    <!-- Aquí se cargan los servidores -->
+  {% if servidores %}
+  <div class="row">
+    {% for servidor in servidores %}
+    <div class="col-md-6">
+      <div class="card mb-4 shadow-sm {% if servidor.estado == 'running' %}border-success{% else %}border-secondary{% endif %}">
+        <div class="card-body">
+          <h5 class="card-title">{{ servidor.nombre }}</h5>
+          <p><strong>IP:</strong> {{ servidor.ip }}</p>
+          <p><strong>Sistema Operativo:</strong> {{ servidor.sistema }}</p>
+          <p><strong>Estado del contenedor:</strong>
+            <span class="badge {% if servidor.estado == 'running' %}bg-success{% else %}bg-secondary{% endif %}">
+              {{ servidor.estado|title }}
+            </span>
+          </p>
+          
+
+          <hr>
+          <h6>Servicios</h6>
+          <ul class="list-group">
+            {% for servicio in servidor.servicios %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                {{ servicio.nombre }}
+                <span class="badge {% if servicio.estado == 'activo' %}bg-success{% else %}bg-secondary{% endif %} ms-2">
+                  {{ servicio.estado }}
+                </span>
+              </div>
+              <div>
+                <button class="btn btn-sm btn-warning me-1"
+                  onclick="accionServicio('{{ servidor.contenedor }}', '{{ servicio.nombre }}', 'reiniciar')">
+                  🔁 Reiniciar
+                </button>
+                <button class="btn btn-sm btn-danger"
+                  onclick="accionServicio('{{ servidor.contenedor }}', '{{ servicio.nombre }}', 'detener')">
+                  ⛔ Detener
+                </button>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
+  {% else %}
+  <p class="text-center text-muted">No hay servidores registrados aún.</p>
+  {% endif %}
 </div>
 
+<script>
+  function accionServicio(contenedor, servicio, accion) {
+    fetch("/accion-servicio/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken")
+      },
+      body: JSON.stringify({
+        contenedor: contenedor,
+        servicio: servicio,
+        accion: accion
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.mensaje);
+      location.reload();
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("Ocurrió un error al intentar controlar el servicio.");
+    });
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
 {% endblock %}
