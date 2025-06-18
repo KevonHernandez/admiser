@@ -10,7 +10,7 @@ load_dotenv()
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -75,7 +75,7 @@ DATABASES = {
          'USER': os.getenv('DB_USER'),
          'PASSWORD': os.getenv('DB_PASSWORD'),
          'HOST':os.getenv('DB_HOST'),
-         'PORT':os.getenv('PORT')
+         'PORT':os.getenv('PORT'),
      }
  }
 
@@ -102,9 +102,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Mexico_City'
 
 USE_I18N = True
 
@@ -139,7 +139,6 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASS')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 180
 
 # Evitar que la aplicación sea cargada en un iframe (clickjacking)
 X_FRAME_OPTIONS = 'DENY'  # Impide que tu sitio se cargue dentro de un iframe en otro sitio
@@ -154,7 +153,7 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_REFERRER_POLICY = 'same-origin'
 
 # Limita la duración de la sesión
-
+SESSION_COOKIE_AGE = 180
 
 # Impide que la cookie de sesión se envíe a otros dominios
 SESSION_COOKIE_DOMAIN = None  # Esto asegura que la cookie solo sea accesible desde el dominio actual.
@@ -163,15 +162,19 @@ SESSION_COOKIE_DOMAIN = None  # Esto asegura que la cookie solo sea accesible de
 SESSION_COOKIE_HTTPONLY = True  # Esto evita que la cookie sea accesible a través de JavaScript.
 
 # Fuerza el uso de HTTPS
-SECURE_SSL_REDIRECT = True  # Redirige automáticamente todo el tráfico HTTP a HTTPS
+#SECURE_SSL_REDIRECT = True  # Redirige automáticamente todo el tráfico HTTP a HTTPS
 
 # Asegura que la cookie de sesión solo se envíe a través de HTTPS
 SESSION_COOKIE_SECURE = True  # Solo se enviará por HTTPS
 
-# Hacer que las cookies de sesión sean más seguras
+# Hacer que las cookies de sesión sean más seguras:
 CSRF_COOKIE_SECURE = True  # Solo envía la cookie CSRF en conexiones HTTPS
 
-# Asegura que solo el dominio que tú controlas puede usar la cookie CSRF
-#CSRF_TRUSTED_ORIGINS = [
-#    'https://localhost.com',  # cambia por el real
-#]
+CSRF_COOKIE_DOMAIN = '.admiser.com'  # incluye subdominios
+SESSION_COOKIE_DOMAIN = ".admiser.com"
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://admiser.com",
+    "https://www.admiser.com"  # si también tienes esta versión con 'www'
+]
