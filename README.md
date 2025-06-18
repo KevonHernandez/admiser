@@ -48,10 +48,13 @@ La plataforma permite a un administrador:
 
 ## 📊 Modelado de Amenazas
 
-- DFD Nivel 0, Nivel 1 y Nivel N
+- Modelado de amenazas Nivel 0, Nivel 1 y Nivel N
 - Tablas de elementos, amenazas y mitigaciones
 - Documento disponible en:  https://docs.google.com/spreadsheets/d/1bqkrJocpoKZAc-KG7rXUTdmRV-b47t5GvxDwki2I7-0/edit?usp=sharing
 ---
+
+Diagrama de flujo de datos: Nivel 0 y 1
+Documento disponible en: https://drive.google.com/file/d/1vxexBkIEXkxEwxQoNMK66w4UPTkCKjCz/view?usp=drive_link
 
 ## 📦 Entregables
 
