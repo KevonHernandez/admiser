@@ -1,92 +1,59 @@
+# views.py (añade estas vistas)
+from django.shortcuts import render, redirect, get_object_or_404
+from AdmiSer.models import Servidor
+from ..forms import ServidorForm, ServicioForm
+import paramiko
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from AdmiSer.models import Servidor, Servicio
-import docker
-import random
-import string
+from ..forms import ServidorForm
 
-def generar_nombre_contenedor(nombre_servidor):
-    sufijo = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
-    return f"{nombre_servidor.lower().replace(' ', '_')}_{sufijo}"
 
-def instalar_servicios_comando(servicios, sistema):
-    comandos = []
 
-    if sistema in ["ubuntu", "debian"]:
-        comandos.append("apt-get update")
 
-        for servicio in servicios:
-            if servicio == "apache2":
-                comandos.append("apt-get install -y apache2")
-            elif servicio == "nginx":
-                comandos.append("apt-get install -y nginx")
+def registrar_servidor(request):
+    if request.method == 'POST':
+        form = ServidorForm(request.POST)
+        if form.is_valid():
+            ip = form.cleaned_data['ip']
+            usuario = form.cleaned_data['usuario']  
+            password = form.cleaned_data['password'] 
+
+            conectado, error = probar_conexion_ssh(ip, usuario, password)
+            if conectado:
+                form.save()
+                messages.success(request, "Servidor registrado y conexión SSH exitosa.")
+                return redirect('AdmiSer:dashboard')  # O donde quieras
             else:
-                # Servicio desconocido: solo avisamos que se intentará instalar
-                comandos.append(f"apt-get install -y {servicio}")
-    
-    return " && ".join(comandos)
+                messages.error(request, f"No se pudo conectar vía SSH: {error}")
 
-def asignar_puerto(servicio):
-    puertos = {
-        'apache2': 80,
-        'nginx': 8080
-    }
-    # Si el servicio no es conocido, asignamos un puerto ficticio 0
-    return puertos.get(servicio, 0)
+    else:
+        form = ServidorForm()
+    return render(request, 'registrar_servidor.html', {'form': form})
 
-def registrarservidor(request):
-    if request.method == "POST":
-        nombre_servidor = request.POST["nombre_servidor"]
-        ip = request.POST["ip"]
-        sistema = request.POST["sistema_operativo"]
-        servicios = request.POST.getlist("servicios")
+# Agregar servicio a un servidor (desde dashboard, ajax o form simple)
+def agregar_servicio(request, servidor_id):
+    servidor = get_object_or_404(Servidor, id=servidor_id)
+    if request.method == 'POST':
+        form = ServicioForm(request.POST)
+        if form.is_valid():
+            servicio = form.save(commit=False)
+            servicio.servidor = servidor
+            servicio.save()
+            return redirect('AdmiSer:dashboard')
+    else:
+        form = ServicioForm()
+    return render(request, 'agregar_servicio.html', {'form': form, 'servidor': servidor})
 
-        # El campo de texto con servicio personalizado (si fue marcado)
-        otro_servicio = request.POST.get("otro_servicio_input", "").strip()
-        if otro_servicio:
-            servicios.append(otro_servicio.lower())
-
-        nombre_contenedor = generar_nombre_contenedor(nombre_servidor)
-
-        try:
-            client = docker.from_env()
-            comandos = instalar_servicios_comando(servicios, sistema)
-
-            if not comandos:
-                raise Exception("No se generaron comandos para los servicios.")
-
-            contenedor = client.containers.run(
-                image=sistema,
-                name=nombre_contenedor,
-                command=["bash", "-c", comandos + " && tail -f /dev/null"],
-                detach=True,
-                tty=True,
-            )
-
-            nuevo_servidor = Servidor.objects.create(
-                nombre_servidor=nombre_servidor,
-                ip=ip,
-                sistema_operativo=sistema,
-                lista_servicios=",".join(servicios),
-                nombre_contenedor=nombre_contenedor,
-            )
-
-            for nombre_servicio in servicios:
-                Servicio.objects.create(
-                    nombre=nombre_servicio,
-                    puerto=asignar_puerto(nombre_servicio),
-                    servidor=nuevo_servidor,
-                    status_servicio='Desconocido'
-                )
-
-            messages.success(request, "Servidor registrado y contenedor creado exitosamente.")
-            return redirect("AdmiSer:dashboard")
-
-        except docker.errors.ImageNotFound:
-            messages.error(request, "Imagen no encontrada para el sistema operativo seleccionado.")
-        except Exception as e:
-            messages.error(request, f"Error al crear el contenedor: {e}")
-
-        return redirect("AdmiSer:registrarservidor")
-
-    return render(request, "registrarservidor.html")
+def probar_conexion_ssh(ip, usuario, password, puerto=22):
+    try:
+        cliente = paramiko.SSHClient()
+        cliente.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        cliente.connect(hostname=ip, username=usuario, password=password, port=puerto, timeout=5)
+        cliente.close()
+        return True, None
+    except paramiko.AuthenticationException:
+        return False, "Error de autenticación: Usuario o contraseña incorrectos."
+    except paramiko.SSHException as e:
+        return False, f"Error en SSH: {str(e)}"
+    except Exception as e:
+        return False, f"No se pudo conectar: {str(e)}"
