@@ -1,105 +1,114 @@
 {% extends 'base.html' %}
-
-{% block title %}Monitor de Servidores{% endblock %}
+{% load static %}
+{% block title %}Panel de Servicios{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <h1 class="text-center mb-4">Monitor de Servidores</h1>
+<h1 class="text-center my-4">Panel de Control</h1>
 
-  <div class="text-center mb-4">
-    <a href="{% url 'AdmiSer:registrarservidor' %}" class="btn btn-success btn-lg">
-      ➕ Registrar nuevo servidor
-    </a>
-  </div>
+{% if messages %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+  {% for message in messages %}
+    {{ message }}
+  {% endfor %}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
 
-  {% if servidores %}
+<div class="container">
   <div class="row">
     {% for servidor in servidores %}
-    <div class="col-md-6">
-      <div class="card mb-4 shadow-sm {% if servidor.estado == 'running' %}border-success{% else %}border-secondary{% endif %}">
+    <div class="col-md-6 mb-4">
+      <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">{{ servidor.nombre }} <small>({{ servidor.ip }})</small></h5>
+        </div>
         <div class="card-body">
-          <h5 class="card-title">{{ servidor.nombre }}</h5>
-          <p><strong>IP:</strong> {{ servidor.ip }}</p>
-          <p><strong>Sistema Operativo:</strong> {{ servidor.sistema }}</p>
-          <p><strong>Estado del contenedor:</strong>
-            <span class="badge {% if servidor.estado == 'running' %}bg-success{% else %}bg-secondary{% endif %}">
-              {{ servidor.estado|title }}
-            </span>
-          </p>
-          
 
-          <hr>
-          <h6>Servicios</h6>
-          <ul class="list-group">
-            {% for servicio in servidor.servicios %}
+          {% if servidor.servicio_set.all %}
+          <ul class="list-group mb-3">
+            {% for servicio in servidor.servicio_set.all %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <div>
-                {{ servicio.nombre }}
-                <span class="badge {% if servicio.estado == 'activo' %}bg-success{% else %}bg-secondary{% endif %} ms-2">
-                  {{ servicio.estado }}
-                </span>
+                <strong>{{ servicio.nombre }}</strong>
+                <span id="estado_led_{{ servicio.id }}" class="ms-2 estado-led bg-secondary"></span>
               </div>
-              <div>
-                <button class="btn btn-sm btn-warning me-1"
-                  onclick="accionServicio('{{ servidor.contenedor }}', '{{ servicio.nombre }}', 'reiniciar')">
-                  🔁 Reiniciar
-                </button>
-                <button class="btn btn-sm btn-danger"
-                  onclick="accionServicio('{{ servidor.contenedor }}', '{{ servicio.nombre }}', 'detener')">
-                  ⛔ Detener
-                </button>
+              <div class="btn-group btn-group-sm" role="group">
+                <button class="btn btn-success" onclick="ejecutarAccion({{ servicio.id }}, 'levantar')">Levantar</button>
+                <button class="btn btn-warning" onclick="ejecutarAccion({{ servicio.id }}, 'reiniciar')">Reiniciar</button>
+                <button class="btn btn-danger" onclick="ejecutarAccion({{ servicio.id }}, 'detener')">Detener</button>
+                <button class="btn btn-secondary" onclick="ejecutarAccion({{ servicio.id }}, 'estado')">Ver Estado</button>
               </div>
             </li>
             {% endfor %}
           </ul>
+          {% else %}
+          <p class="text-muted">No hay servicios en este servidor.</p>
+          {% endif %}
+
+          <form method="POST" class="d-flex">
+            {% csrf_token %}
+            <input type="hidden" name="servidor_id" value="{{ servidor.id }}">
+            <input type="text" name="nombre_servicio" class="form-control me-2" placeholder="Nombre del servicio" required>
+            <button type="submit" class="btn btn-outline-primary">Agregar</button>
+          </form>
+
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
-  {% else %}
-  <p class="text-center text-muted">No hay servidores registrados aún.</p>
-  {% endif %}
+
+  <div class="text-center mt-4">
+    <a href="{% url 'AdmiSer:registrarservidor' %}" class="btn btn-primary btn-lg">
+      + Registrar nuevo servidor
+    </a>
+  </div>
 </div>
 
-<script>
-  function accionServicio(contenedor, servicio, accion) {
-    fetch("/accion-servicio/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCookie("csrftoken")
-      },
-      body: JSON.stringify({
-        contenedor: contenedor,
-        servicio: servicio,
-        accion: accion
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.mensaje);
-      location.reload();
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      alert("Ocurrió un error al intentar controlar el servicio.");
-    });
+<style>
+  .estado-led {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
+  .estado-led.activo {
+    background-color: #28a745;
+    box-shadow: 0 0 10px #28a745;
+  }
+  .estado-led.inactivo {
+    background-color: #dc3545;
+    box-shadow: 0 0 10px #dc3545;
+  }
+  .estado-led.desconocido {
+    background-color: #6c757d;
+    box-shadow: 0 0 10px #6c757d;
+  }
+</style>
 
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + "=")) {
-          cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
-          break;
+<script>
+  function ejecutarAccion(servicioId, accion) {
+    const url = `/servicio/${accion}/${servicioId}/`;
+
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error('Error en la petición');
+        return res.json();
+      })
+      .then(data => {
+        const led = document.getElementById(`estado_led_${servicioId}`);
+        if (data.estado) {
+          if (led) {
+            led.classList.remove('activo', 'inactivo', 'desconocido');
+            led.classList.add(data.estado);
+          }
         }
-      }
-    }
-    return cookieValue;
+        alert(data.resultado || `Estado: ${data.estado}`);
+      })
+      .catch(err => alert("Error: " + err.message));
   }
 </script>
+
 {% endblock %}

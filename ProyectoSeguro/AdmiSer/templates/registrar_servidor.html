@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+
+  <div style="width: 400px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+
+    <h2 class="text-center mb-4">Registro de Servidor</h2>
+
+    {% if messages %}
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+          <p class="mb-0">{{ message }}</p>
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary w-100 mt-3">Guardar</button>
+    </form>
+
+  </div>
+
+</div>
+{% endblock %}

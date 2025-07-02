@@ -1,0 +1,12 @@
+<h2>Lista de Servidores</h2>
+
+<ul>
+  {% for servidor in servidores %}
+    <li>{{ servidor.nombre }} - {{ servidor.ip }}</li>
+  {% empty %}
+    <li>No hay servidores registrados</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'AdmiSer:registrar_servidor' %}">Registrar nuevo servidor</a>
+<a href="{% url 'AdmiSer:dashboard' %}">Volver al Dashboard</a>
