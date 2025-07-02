@@ -10,7 +10,7 @@ load_dotenv()
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -156,16 +156,16 @@ SECURE_REFERRER_POLICY = 'same-origin'
 SESSION_COOKIE_AGE = 180
 
 # Impide que la cookie de sesión se envíe a otros dominios
-SESSION_COOKIE_DOMAIN = None  # Esto asegura que la cookie solo sea accesible desde el dominio actual.
+SESSION_COOKIE_DOMAIN = True  # Esto asegura que la cookie solo sea accesible desde el dominio actual.
 
 # Hacer que la cookie de sesión tenga solo acceso HTTP (no accesible a través de JavaScript)
 SESSION_COOKIE_HTTPONLY = True  # Esto evita que la cookie sea accesible a través de JavaScript.
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Fuerza el uso de HTTPS
-#SECURE_SSL_REDIRECT = True  # Redirige automáticamente todo el tráfico HTTP a HTTPS
+SECURE_SSL_REDIRECT = True  # Redirige automáticamente todo el tráfico HTTP a HTTPS
 
 # Asegura que la cookie de sesión solo se envíe a través de HTTPS
-SESSION_COOKIE_SECURE = True  # Solo se enviará por HTTPS
+#SESSION_COOKIE_SECURE = True  # Solo se enviará por HTTPS
 
 # Hacer que las cookies de sesión sean más seguras:
 CSRF_COOKIE_SECURE = True  # Solo envía la cookie CSRF en conexiones HTTPS
@@ -178,3 +178,4 @@ CSRF_TRUSTED_ORIGINS = [
     "https://admiser.com",
     "https://www.admiser.com"  # si también tienes esta versión con 'www'
 ]
+    
