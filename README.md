@@ -1,94 +1,77 @@
 # Plataforma Web para la Administración Segura de Servicios en Servidores Linux
 
-## 📌 Descripción General
+## 📌 Introducción  
+Este proyecto es parte de la Experiencia Educativa *Programación Segura*, y tiene como objetivo desarrollar una **plataforma web segura** para la administración remota de servicios en servidores Linux.
 
-Este proyecto es parte de la **Experiencia Educativa Programación Segura**, y tiene como objetivo desarrollar una plataforma web segura para la **administración remota de servicios en servidores Linux**.
+## 🎯 Propósito  
+Diseñar e implementar una solución web que permita a administradores registrar servidores Linux, gestionar servicios de forma remota y monitorear su estado en tiempo real, cumpliendo con estándares de seguridad y buenas prácticas de desarrollo seguro.
 
-La plataforma permite a un administrador:
-- Registrar múltiples servidores Linux
-- Levantar y controlar servicios de forma remota
-- Monitorear el estado de los servicios en tiempo real
+## ✅ Requerimientos
 
----
+### Rol y Funcionalidades
 
-## 👤 Rol y Funcionalidades
+**Rol requerido:** Administrador  
+**Funcionalidades principales:**
 
-### Rol: Admin
+- **Registro de Servidores:**  
+  - Adición de múltiples servidores Linux.  
+  - Registro de servicios por servidor (N servicios por N servidores).  
 
-#### 🔐 Registro de Servidores
-- Es posible agregar una N cantidad de servidores con N servicios.
-  
-#### ⚙️ Levantar Servicios
-- Por cada servidor registrado, es posible levantar servicios individualmente
-- Validación ante servicios inexistentes o errores de ejecución
+- **Levantamiento de Servicios:**  
+  - Levantar servicios individualmente.  
+  - Validación frente a servicios inexistentes o con errores.
 
-#### 🔄 Administración de Servicios
-- Visualización de todos los servicios activos por servidor
-- Acciones posibles:
-  - **Reiniciar**
-  - **Dar de baja**
-  - **Ver estado**
+- **Administración de Servicios:**  
+  - Visualización de servicios activos por servidor.  
+  - Acciones disponibles:
+    - Reiniciar  
+    - Dar de baja  
+    - Ver estado  
 
-#### 📊 Monitorización
-- Panel de control (Dashboard) actualizado automáticamente
-- Estado de cada servicio: **Activo / Inactivo**
-- Monitorización periódica.
+- **Monitorización:**  
+  - Panel de control (dashboard) en tiempo real.  
+  - Estado de cada servicio (Activo/Inactivo).  
+  - Monitorización periódica automatizada.
 
----
+### 🔐 Seguridad
 
-## 🔐 Seguridad
+- Autenticación segura con contraseña y OTP.  
+- Regeneración segura de sesiones.  
+- Bloqueo de IP tras múltiples intentos fallidos.  
+- Cifrado del archivo `.env`.  
+- Modelado de amenazas con DFDs y tablas.
 
-- Autenticación mediante contraseña segura y OTP
-- Sesiones protegidas y regeneración segura
-- Bloqueo de IP tras múltiples intentos fallidos
-- Cifrado del archivo `.env`.
-- Modelado de amenazas documentado en DFDs y tablas
+## 🔄 DFDs (Diagramas de Flujo de Datos)
 
----
+- **DFD Nivel 0**  
+- **DFD Nivel 1**  
+- **DFD Nivel N**
 
-## 📊 Modelado de Amenazas
+> Diagramas disponibles en:  
+> [Diagrama en diagrams.net](https://app.diagrams.net/#G1rmajD7oRP7UEVOo0qPNuMnyiPfEhhGzL#%7B%22pageId%22%3A%22C5RBs43oDa-KdzZeNtuy%22%7D)
 
-- Modelado de amenazas Nivel 0, Nivel 1 y Nivel N
-- Tablas de elementos, amenazas y mitigaciones
-- Documento disponible en:  https://docs.google.com/spreadsheets/d/1bqkrJocpoKZAc-KG7rXUTdmRV-b47t5GvxDwki2I7-0/edit?usp=sharing
----
+## 🛡️ Tablas de amenazas y mitigaciones
 
-Diagrama de flujo de datos: Nivel 0 y 1
-Documento disponible en: https://drive.google.com/file/d/1vxexBkIEXkxEwxQoNMK66w4UPTkCKjCz/view?usp=drive_link
+Incluye los siguientes elementos:
 
-## 📦 Entregables
+- Elementos del sistema  
+- Tipos de amenazas asociadas  
+- Estrategias de mitigación implementadas  
 
-- Documento PDF del proyecto:
-  - Introducción
-  - Propósito
-  - Requerimientos
-  - DFDs
-  - Tablas de amenazas y mitigaciones
-
----
-
+> Documento disponible en:  
+> [Hoja de amenazas y mitigaciones (Google Sheets)](https://docs.google.com/spreadsheets/d/1bqkrJocpoKZAc-KG7rXUTdmRV-b47t5GvxDwki2I7-0/edit?usp=sharing)
 
 ## ⚠️ Restricciones
 
-- Uso exclusivo de servidores Linux
-- Manejo seguro de credenciales (vía clave pública)
-- No debe usarse `.env` en texto plano en producción
+- Exclusivo para servidores con sistema operativo Linux.  
+- Manejo seguro de credenciales mediante clave pública.  
+- Prohibido almacenar `.env` en texto plano en entornos productivos.
 
----
+## 🚀 Tecnologías Utilizadas
 
-## 🚀 Tecnologías Usadas
-
-- Django (Python)
-- Bootstrap (Frontend)
-- SSH / Systemctl (Back-end de control)
-- SQLite / MySQL (según entorno)
-- `cryptography` (cifrado de configuración)
-- Email (para OTP)
-
----
-
-
-## 📜 Licencia
-
-Este proyecto es de uso académico bajo fines educativos.  
-Todos los derechos reservados © 2025.
+- **Backend:** Django (Python)  
+- **Frontend:** Bootstrap  
+- **Conectividad y control:** SSH y Systemctl  
+- **Base de datos:** SQLite / MySQL  
+- **Cifrado y seguridad:** cryptography (cifrado de archivos y claves)  
+- **OTP:** Correo electrónico
