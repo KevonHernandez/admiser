@@ -87,7 +87,7 @@ def ejecutar_comando_ssh(servidor, comando):
     finally:
         cliente.close()
 
-
+@sesion_requerida
 def accion_servicio(request, accion, servicio_id):
     """Realiza una acción sobre un servicio en un servidor remoto.
     Args:
