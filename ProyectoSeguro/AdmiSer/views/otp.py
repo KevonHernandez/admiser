@@ -39,24 +39,25 @@ def verificar_otp(request):
         form = OTPForm(request.POST)
         if form.is_valid():
             otp_code = form.cleaned_data['otp']
-            otp = OTPToken.objects.filter(user=usuario, token=otp_code).last()  # no importa si used=True
+            otp = OTPToken.objects.filter(user=usuario, token=otp_code).last()
 
-            # Invalida cualquier OTP anterior
             OTPToken.objects.filter(user=usuario).update(used=True)
-            # 🔐 Verifica que el session_id del OTP coincida con el de la sesión
             session_id_actual = request.session.get('otp_session_id')
-            print(f"Session ID actual: {session_id_actual}")  # Para depuración
+
             if otp and otp.is_valid() and str(otp.session_id) == session_id_actual:
                 iniciar_sesion_segura(request, usuario)
                 messages.success(request, 'Inicio de sesión exitoso.')
                 return redirect('AdmiSer:dashboard')
             else:
-                request.session.pop('usuario_otp', None)
-                messages.error(request, 'OTP inválido o expirado.')
+                ip = get_client_ip(request) 
                 registrar_intento(ip)
-                limpiar_sesion_login(request)
-
+                messages.error(request, 'OTP inválido o expirado.')
+                # Primero borrar claves específicas, sin limpiar toda la sesión
+                request.session.pop('usuario_otp', None)
+                request.session.pop('otp_session_id', None)
+               
                 return redirect('AdmiSer:login')
+
         else:
             limpiar_sesion_login(request)
             messages.error(request, 'Código OTP mal formado.')
