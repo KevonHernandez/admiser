@@ -58,7 +58,7 @@ def dashboard(request):
     }
     return render(request, 'dashboard.html', context)
 
-
+@sesion_requerida
 def ejecutar_comando_ssh(servidor, comando):
     """Ejecuta un comando en un servidor remoto a través de SSH.
         Args:
