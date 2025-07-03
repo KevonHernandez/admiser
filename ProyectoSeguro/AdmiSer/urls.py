@@ -3,7 +3,7 @@ from .views.session import logout
 from .views.otp import verificar_otp
 from .views.login import login
 from .views.registro import registro
-from .views.dashboard import accion_servicio, dashboard, listar_servidores
+from .views.dashboard import accion_servicio, dashboard, listar_servidores, validar_password, verificar_estados_servicios
 from .views.registrarservidor import registrar_servidor
 from . import views
 
