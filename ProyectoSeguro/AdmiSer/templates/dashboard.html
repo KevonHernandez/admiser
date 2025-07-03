@@ -1,18 +1,17 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %}Panel de Servicios{% endblock %}
 
 {% block content %}
-<h1 class="text-center my-4">Panel de Control</h1>
+<h2>Panel de Control de Servicios</h2>
 
 {% if messages %}
-<div class="alert alert-info alert-dismissible fade show" role="alert">
+<div class="alert alert-warning alert-dismissible fade show" role="alert" aria-live="polite">
   {% for message in messages %}
-    {{ message }}
+    <p>{{ message }}</p>
   {% endfor %}
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar mensaje"></button>
 </div>
 {% endif %}
+
 
 <div class="container">
   <div class="row">
@@ -24,33 +23,32 @@
         </div>
         <div class="card-body">
 
-          {% if servidor.servicio_set.all %}
-          <ul class="list-group mb-3">
-            {% for servicio in servidor.servicio_set.all %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div>
-                <strong>{{ servicio.nombre }}</strong>
-                <span id="estado_led_{{ servicio.id }}" class="ms-2 estado-led bg-secondary"></span>
-              </div>
-              <div class="btn-group btn-group-sm" role="group">
-                <button class="btn btn-success" onclick="ejecutarAccion({{ servicio.id }}, 'levantar')">Levantar</button>
-                <button class="btn btn-warning" onclick="ejecutarAccion({{ servicio.id }}, 'reiniciar')">Reiniciar</button>
-                <button class="btn btn-danger" onclick="ejecutarAccion({{ servicio.id }}, 'detener')">Detener</button>
-                <button class="btn btn-secondary" onclick="ejecutarAccion({{ servicio.id }}, 'estado')">Ver Estado</button>
-              </div>
-            </li>
-            {% endfor %}
-          </ul>
-          {% else %}
-          <p class="text-muted">No hay servicios en este servidor.</p>
-          {% endif %}
-
-          <form method="POST" class="d-flex">
+          <form method="post" class="agregar-servicio d-flex mb-3">
             {% csrf_token %}
             <input type="hidden" name="servidor_id" value="{{ servidor.id }}">
-            <input type="text" name="nombre_servicio" class="form-control me-2" placeholder="Nombre del servicio" required>
+            <input type="text" name="nombre_servicio" class="form-control me-2" placeholder="Nombre del nuevo servicio" required>
             <button type="submit" class="btn btn-outline-primary">Agregar</button>
           </form>
+
+          <ul class="list-group lista-servicios">
+            {% for servicio in servidor.servicio_set.all %}
+            <li class="list-group-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ servicio.nombre }}</strong> -
+                  <span id="estado-servicio-{{ servicio.id }}">Cargando...</span>
+                </div>
+                <div class="acciones btn-group btn-group-sm" role="group">
+                  <button class="btn btn-success" onclick="ejecutarAccion('{{ servicio.id }}', 'levantar')">Levantar</button>
+                  <button class="btn btn-warning" onclick="ejecutarAccion('{{ servicio.id }}', 'reiniciar')">Reiniciar</button>
+                  <button class="btn btn-danger" onclick="ejecutarAccion('{{ servicio.id }}', 'detener')">Detener</button>
+                </div>
+              </div>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">No hay servicios registrados.</li>
+            {% endfor %}
+          </ul>
 
         </div>
       </div>
@@ -64,51 +62,9 @@
     </a>
   </div>
 </div>
-
-<style>
-  .estado-led {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  .estado-led.activo {
-    background-color: #28a745;
-    box-shadow: 0 0 10px #28a745;
-  }
-  .estado-led.inactivo {
-    background-color: #dc3545;
-    box-shadow: 0 0 10px #dc3545;
-  }
-  .estado-led.desconocido {
-    background-color: #6c757d;
-    box-shadow: 0 0 10px #6c757d;
-  }
-</style>
-
 <script>
-  function ejecutarAccion(servicioId, accion) {
-    const url = `/servicio/${accion}/${servicioId}/`;
-
-    fetch(url)
-      .then(res => {
-        if (!res.ok) throw new Error('Error en la petición');
-        return res.json();
-      })
-      .then(data => {
-        const led = document.getElementById(`estado_led_${servicioId}`);
-        if (data.estado) {
-          if (led) {
-            led.classList.remove('activo', 'inactivo', 'desconocido');
-            led.classList.add(data.estado);
-          }
-        }
-        alert(data.resultado || `Estado: ${data.estado}`);
-      })
-      .catch(err => alert("Error: " + err.message));
-  }
+  const URL_VERIFICAR_ESTADOS = "{% url 'AdmiSer:verificar_estados_servicios' %}";
 </script>
+
 
 {% endblock %}
