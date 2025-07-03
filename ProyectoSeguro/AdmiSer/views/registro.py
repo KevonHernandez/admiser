@@ -2,11 +2,20 @@
 import base64
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from ..cripto.passvalidation import password_check
+from ..utils.passvalidation import password_check
 from ..models import Usuario
-from ..cripto.hasheo import generar_salt, hashear_password, convertir_binario_texto64
+from ..utils.hasheo import generar_salt, hashear_password, convertir_binario_texto64
 
 def registro(request):
+    """
+    Vista para registrar un nuevo usuario.
+    Permite ingresar nombre completo, nick, contraseña y correo electrónico
+    Args:
+        request (HttpRequest): La solicitud HTTP del usuario.
+    Returns:
+        HttpResponse: Renderiza el formulario de registro o redirige al login si el registro es exitoso.
+    """
+
     if request.method == 'POST':
         nombre_completo = request.POST['nombre_completo']
         nick = request.POST['nick']
@@ -44,7 +53,6 @@ def registro(request):
         salt = generar_salt()
         hash_password, salt = hashear_password(password, salt)
 
-        # Crear el usuario sin llaves
         nuevo_usuario = Usuario(
             nombre_completo=nombre_completo,
             nick=nick,
